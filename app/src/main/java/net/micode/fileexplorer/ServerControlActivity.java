@@ -42,6 +42,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -55,7 +56,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.net.InetAddress;
 
-public class ServerControlActivity extends Fragment implements IBackPressedListener {
+public class ServerControlActivity extends Activity implements IBackPressedListener {
 
     private TextView ipText;
 
@@ -82,39 +83,36 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
 
     private View startStopButton;
 
-    private Activity mActivity;
-
-    private View mRootView;
 
     public ServerControlActivity() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mActivity = getActivity();
-        mRootView = inflater.inflate(R.layout.server_control_activity, container, false);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.server_control_activity);
 
         // Set the application-wide context global, if not already set
         Context myContext = Globals.getContext();
         if (myContext == null) {
-            myContext = mActivity.getApplicationContext();
+            myContext =getApplicationContext();
             if (myContext == null) {
                 throw new NullPointerException("Null context!?!?!?");
             }
             Globals.setContext(myContext);
         }
 
-        ipText = (TextView) mRootView.findViewById(R.id.ip_address);
-        instructionText = (TextView) mRootView.findViewById(R.id.instruction);
-        instructionTextPre = (TextView) mRootView.findViewById(R.id.instruction_pre);
-        startStopButton = mRootView.findViewById(R.id.start_stop_button);
+        ipText = (TextView) findViewById(R.id.ip_address);
+        instructionText = (TextView) findViewById(R.id.instruction);
+        instructionTextPre = (TextView) findViewById(R.id.instruction_pre);
+        startStopButton = findViewById(R.id.start_stop_button);
         startStopButton.setOnClickListener(startStopListener);
 
         updateUi();
         UiUpdater.registerClient(handler);
-        
+
         // quickly turn on or off wifi.
-        mRootView.findViewById(R.id.wifi_state_image).setOnClickListener(
+        findViewById(R.id.wifi_state_image).setOnClickListener(
                 new OnClickListener() {
                     public void onClick(View v) {
                         Intent intent = new Intent(
@@ -122,9 +120,9 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
                         startActivity(intent);
                     }
                 });
-        
-        return mRootView;
+
     }
+
 
     @Override
     public boolean onBack() {
@@ -151,7 +149,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        mActivity.registerReceiver(wifiReceiver, filter);
+        registerReceiver(wifiReceiver, filter);
     }
 
     /*
@@ -162,7 +160,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
         super.onPause();
         UiUpdater.unregisterClient(handler);
         myLog.l(Log.DEBUG, "Unregistered for wifi updates");
-        mActivity.unregisterReceiver(wifiReceiver);
+        unregisterReceiver(wifiReceiver);
     }
 
     public void onStop() {
@@ -184,14 +182,14 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
     public void updateUi() {
         myLog.l(Log.DEBUG, "Updating UI", true);
 
-        WifiManager wifiMgr = (WifiManager) mActivity.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         int wifiState = wifiMgr.getWifiState();
         WifiInfo info = wifiMgr.getConnectionInfo();
         String wifiId = info != null ? info.getSSID() : null;
         boolean isWifiReady = FTPServerService.isWifiEnabled();
 
         setText(R.id.wifi_state, isWifiReady ? wifiId : getString(R.string.no_wifi_hint));
-        ImageView wifiImg = (ImageView) mRootView.findViewById(R.id.wifi_state_image);
+        ImageView wifiImg = (ImageView) findViewById(R.id.wifi_state_image);
         wifiImg.setImageResource(isWifiReady ? R.drawable.wifi_state4 : R.drawable.wifi_state0);
 
         boolean running = FTPServerService.isRunning();
@@ -206,7 +204,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
 
             } else {
                 // could not get IP address, stop the service
-                Context context = mActivity.getApplicationContext();
+                Context context = getApplicationContext();
                 Intent intent = new Intent(context, FTPServerService.class);
                 context.stopService(intent);
                 ipText.setText("");
@@ -214,7 +212,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
         }
 
         startStopButton.setEnabled(isWifiReady);
-        TextView startStopButtonText = (TextView) mRootView.findViewById(R.id.start_stop_button_text);
+        TextView startStopButtonText = (TextView) findViewById(R.id.start_stop_button_text);
         if (isWifiReady) {
             startStopButtonText.setText(running ? R.string.stop_server : R.string.start_server);
             startStopButtonText.setCompoundDrawablesWithIntrinsicBounds(running ? R.drawable.disconnect
@@ -223,7 +221,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
                     : getResources().getColor(R.color.remote_connect_text));
         } else {
             if (FTPServerService.isRunning()) {
-                Context context = mActivity.getApplicationContext();
+                Context context = getApplicationContext();
                 Intent intent = new Intent(context, FTPServerService.class);
                 context.stopService(intent);
             }
@@ -239,7 +237,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
     }
 
     private void setText(int id, String text) {
-        TextView tv = (TextView) mRootView.findViewById(id);
+        TextView tv = (TextView) findViewById(id);
         tv.setText(text);
     }
 
@@ -250,7 +248,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
             if (!chrootDir.isDirectory())
                 return;
 
-            Context context = mActivity.getApplicationContext();
+            Context context = getApplicationContext();
             Intent intent = new Intent(context, FTPServerService.class);
 
             Globals.setChrootDir(chrootDir);
@@ -269,7 +267,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
         String storageState = Environment.getExternalStorageState();
         if (!storageState.equals(Environment.MEDIA_MOUNTED)) {
             myLog.i("Warning due to storage state " + storageState);
-            Toast toast = Toast.makeText(mActivity, R.string.storage_warning, Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, R.string.storage_warning, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
@@ -283,7 +281,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
     };
 
     boolean requiredSettingsDefined() {
-        SharedPreferences settings = mActivity.getSharedPreferences(Defaults.getSettingsName(), Defaults.getSettingsMode());
+        SharedPreferences settings = getSharedPreferences(Defaults.getSettingsName(), Defaults.getSettingsMode());
         String username = settings.getString("username", null);
         String password = settings.getString("password", null);
         if (username == null || password == null) {
@@ -302,7 +300,7 @@ public class ServerControlActivity extends Fragment implements IBackPressedListe
         if (settings != null) {
             return settings;
         } else {
-            return mActivity.getPreferences(Activity.MODE_PRIVATE);
+            return getPreferences(Activity.MODE_PRIVATE);
         }
     }
 }
