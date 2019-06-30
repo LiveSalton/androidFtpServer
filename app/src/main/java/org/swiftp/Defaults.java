@@ -20,6 +20,7 @@ along with SwiFTP.  If not, see <http://www.gnu.org/licenses/>.
 package org.swiftp;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 public class Defaults {
@@ -35,7 +36,7 @@ public class Defaults {
 	public static int portNumber = 2121; 
 //	protected static int ipRetrievalAttempts = 5;
 	public static final int tcpConnectionBacklog = 5;
-	public static final String chrootDir =  net.micode.fileexplorer.Util.getSdDirectory();
+	public static final String chrootDir = Environment.getExternalStorageDirectory().getPath();
 	public static final boolean acceptWifi = true;
 	public static final boolean acceptNet = false; // don't incur bandwidth charges
 	public static final boolean stayAwake = false;

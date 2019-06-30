@@ -19,14 +19,6 @@ along with SwiFTP.  If not, see <http://www.gnu.org/licenses/>.
 
 package net.micode.fileexplorer;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -41,8 +33,8 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
 import org.swiftp.Defaults;
 import org.swiftp.Globals;
 import org.swiftp.MyLog;
@@ -51,7 +43,14 @@ import org.swiftp.SessionThread;
 import org.swiftp.TcpListener;
 import org.swiftp.UiUpdater;
 import org.swiftp.Util;
-import net.micode.fileexplorer.R;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class FTPServerService extends Service implements Runnable {
     protected static Thread serverThread = null;
@@ -261,10 +260,9 @@ public class FTPServerService extends Service implements Runnable {
             contentText = "ftp://" + address.getHostAddress() + (FTPServerService.getPort() == 21 ? "" : port);
         }
 
-        Intent notificationIntent = new Intent(this, FileExplorerTabActivity.class);
-        notificationIntent.putExtra(GlobalConsts.INTENT_EXTRA_TAB, 2);
+        Intent notificationIntent = new Intent(this, ServerControlActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(getApplicationContext(), null)
+        Notification notification = new Notification.Builder(getApplicationContext(), null)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
                 .setSmallIcon(icon)
@@ -636,7 +634,9 @@ public class FTPServerService extends Service implements Runnable {
         myLog.d("Registered session thread");
     }
 
-    /** Get the ProxyConnector, may return null if proxying is disabled. */
+    /**
+     * Get the ProxyConnector, may return null if proxying is disabled.
+     */
     public ProxyConnector getProxyConnector() {
         return proxyConnector;
     }

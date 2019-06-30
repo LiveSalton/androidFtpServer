@@ -20,15 +20,7 @@
 package net.micode.fileexplorer;
 
 
-import net.micode.fileexplorer.FileExplorerTabActivity.IBackPressedListener;
-
-import org.swiftp.Defaults;
-import org.swiftp.Globals;
-import org.swiftp.MyLog;
-import org.swiftp.UiUpdater;
-
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,21 +34,23 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.swiftp.Defaults;
+import org.swiftp.Globals;
+import org.swiftp.MyLog;
+import org.swiftp.UiUpdater;
+
 import java.io.File;
 import java.net.InetAddress;
 
-public class ServerControlActivity extends Activity implements IBackPressedListener {
+public class ServerControlActivity extends Activity {
 
     private TextView ipText;
 
@@ -78,24 +72,18 @@ public class ServerControlActivity extends Activity implements IBackPressedListe
     };
 
     private TextView instructionText;
-
     private TextView instructionTextPre;
-
     private View startStopButton;
 
-
-    public ServerControlActivity() {
-    }
-
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.server_control_activity);
 
         // Set the application-wide context global, if not already set
         Context myContext = Globals.getContext();
         if (myContext == null) {
-            myContext =getApplicationContext();
+            myContext = getApplicationContext();
             if (myContext == null) {
                 throw new NullPointerException("Null context!?!?!?");
             }
@@ -121,12 +109,6 @@ public class ServerControlActivity extends Activity implements IBackPressedListe
                     }
                 });
 
-    }
-
-
-    @Override
-    public boolean onBack() {
-        return false;
     }
 
     /**
@@ -245,8 +227,9 @@ public class ServerControlActivity extends Activity implements IBackPressedListe
         public void onClick(View v) {
             Globals.setLastError(null);
             File chrootDir = new File(Defaults.chrootDir);
-            if (!chrootDir.isDirectory())
+            if (!chrootDir.isDirectory()) {
                 return;
+            }
 
             Context context = getApplicationContext();
             Intent intent = new Intent(context, FTPServerService.class);
