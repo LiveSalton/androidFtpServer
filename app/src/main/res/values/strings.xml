@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-    <string name="app_name">文件管理</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">FTP服务端</string>
     <string name="start_server">启动服务</string>
     <string name="stop_server">停止服务</string>
     <string name="notif_server_starting">远程管理服务已启动</string>

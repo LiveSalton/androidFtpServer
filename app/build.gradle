@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion "27.0.1"
     defaultConfig {
-        applicationId "net.micode.fileexplorer"
+        applicationId "net.micode.ftpserver"
         minSdkVersion 18
         targetSdkVersion 26
     }
